@@ -1,0 +1,9 @@
+### Getting the Departments
+GET http://localhost:1337/departments
+
+### Adding a Department
+POST http://localhost:1337/departments
+Content-Type: application/json
+{
+  "name": "QA"
+}
