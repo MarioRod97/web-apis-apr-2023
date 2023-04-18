@@ -2,6 +2,7 @@ using AutoMapper;
 using HrApi.Domain;
 using HrApi.Profiles;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 // the default web application builder has about 190+ "Services" that do all the work in your API.
@@ -13,7 +14,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "HR Api",
+        Version = "v1",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name ="Jeff Gonzalez",
+            Email = "jeff@aol.com"
+        },
+        License = new Microsoft.OpenApi.Models.OpenApiLicense
+        {
+            Name = "MIT",
+            Url = new Uri("https://opensource.org/license/mit/")
+        }
+    });
+
+    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
+});
 
 var hrConnectionString = builder.Configuration.GetConnectionString("hr-data");
 
@@ -26,6 +47,8 @@ builder.Services.AddDbContext<HrDataContext>(options =>
 {
     options.UseSqlServer(hrConnectionString);
 });
+
+// "Slow" - so we are "eagerly" creating this at application startup.
 
 var mapperConfiguration = new MapperConfiguration(options =>
 {
@@ -55,5 +78,7 @@ app.MapControllers(); // it is going to create a phone directory.
             // create an instance of the DepartmentsController
                // to create an instance of this, you have to give it a HrDataContext
             // Call the GetDepartments method.
+    // if someone does a get /departments/(SOME INTEGER)
+        // create the departmentcontroller and call getbyid with that integer.
 
 app.Run(); // Starting the web server, and "blocking here"
