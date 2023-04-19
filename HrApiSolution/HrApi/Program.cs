@@ -3,6 +3,8 @@ using HrApi;
 using HrApi.Domain;
 using HrApi.Profiles;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 // The default web application builder has about 195+ "Services" that do all the work in your API
@@ -10,12 +12,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers(options =>
-    options.Filters.Add<CancellationTokenExceptionFilter>()
-);
+{
+    // globally now, every controller will use this filter    
+    options.Filters.Add<CancellationTokenExceptionFilter>();
+}).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -33,9 +39,21 @@ builder.Services.AddSwaggerGen(c =>
             Url = new Uri("https://opensource.org/license/mit/")
         }
     });
+
+    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
 });
 
 var connectionString = builder.Configuration.GetConnectionString("hr-data");
+
+var someValue = builder.Configuration.GetValue<bool>("features:demo");
+
+// IOption<FeaturesOptions>
+builder.Services.Configure<FeaturesOptions>(
+ builder.Configuration.GetSection(FeaturesOptions.FeatureName)
+ );
+
+Console.WriteLine($"Got this value for the limit {someValue}");
 
 if (connectionString is null)
 {
@@ -47,9 +65,12 @@ builder.Services.AddDbContext<HrDataContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+// "Slow" - so we are "eagerly" creating this at application startup.
+
 var mapperConfiguration = new MapperConfiguration(options =>
 { 
     options.AddProfile<Departments>();
+    options.AddProfile<HiringRequests>();
 });
 
 builder.Services.AddSingleton<IMapper>(mapperConfiguration.CreateMapper());
@@ -69,12 +90,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseAuthorization();
 
-app.Use(async (context, next) => {
-    await Console.Out.WriteLineAsync($"Just got a request from {context.Request.Headers.UserAgent}");
-    await next();
-});
+//app.Use(async (context, next) => {
+//    await Console.Out.WriteLineAsync($"Just got a request from {context.Request.Headers.UserAgent}");
+//    await next();
+//});
+// app.Use(LoggingStuff.LogIt);
+app.UseSuperLogging();
 
 // Creates "phone directory"
 app.MapControllers();

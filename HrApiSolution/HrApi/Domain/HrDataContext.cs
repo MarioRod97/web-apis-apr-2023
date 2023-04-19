@@ -8,6 +8,7 @@ public class HrDataContext : DbContext
 
     // Give all the entity classes it should track in the database
     public DbSet<DepartmentEntity> Departments { get; set; }
+    public DbSet<HiringRequestEntity> HiringRequests { get; set; }
 
     public IQueryable<DepartmentEntity> GetActiveDepartments()
     {
