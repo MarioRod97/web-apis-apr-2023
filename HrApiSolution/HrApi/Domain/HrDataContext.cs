@@ -19,5 +19,6 @@ public class HrDataContext : DbContext
     {
         modelBuilder.Entity<DepartmentEntity>().Property(p => p.Name).HasMaxLength(20);
         modelBuilder.Entity<DepartmentEntity>().HasIndex(p => p.Name).IsUnique();
+        modelBuilder.Entity<HiringRequestEntity>().Property(p => p.Salary).HasPrecision(18, 2);
     }
 }

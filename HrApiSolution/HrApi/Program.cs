@@ -76,6 +76,9 @@ var mapperConfiguration = new MapperConfiguration(options =>
 builder.Services.AddSingleton<IMapper>(mapperConfiguration.CreateMapper());
 builder.Services.AddSingleton<MapperConfiguration>(mapperConfiguration);
 
+// Lazy
+builder.Services.AddScoped<IManageHiringRequests, EntityFrameworkHiringManager>();
+
 // World before the application is built is above here.
 var app = builder.Build();
 

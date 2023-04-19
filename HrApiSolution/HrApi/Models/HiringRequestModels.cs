@@ -1,5 +1,10 @@
 ﻿namespace HrApi.Models;
 
+public record HiringRequestSalaryModel
+{
+    public decimal Salary { get; set; }
+}
+
 public record HiringRequestCreateModel
 {
     public string FirstName { get; set; } = string.Empty;
