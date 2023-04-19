@@ -1,4 +1,5 @@
 using AutoMapper;
+using HrApi;
 using HrApi.Domain;
 using HrApi.Profiles;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,31 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+    options.Filters.Add<CancellationTokenExceptionFilter>()
+);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "HR Api",
+        Version = "v1",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Jeff Gonzalez",
+            Email = "jeff@aol.com"
+        },
+        License = new Microsoft.OpenApi.Models.OpenApiLicense
+        {
+            Name = "MIT",
+            Url = new Uri("https://opensource.org/license/mit/")
+        }
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("hr-data");
 
@@ -49,14 +71,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 
+app.Use(async (context, next) => {
+    await Console.Out.WriteLineAsync($"Just got a request from {context.Request.Headers.UserAgent}");
+    await next();
+});
+
 // Creates "phone directory"
 app.MapControllers();
 // Console.WriteLine("About to run the app.");
 
 // Route Table:
 //  If someone does a GET /departments:
-//      public async Task GetDepartments()
-//          return Ok()
+//      Create an instance of the DepartmentsController
+//          To create an instance of this, you have to give
+//      Call the GetDepartments method
+//  If someone does a GET /departments/(SOME INTEGER)
+//      Create the DepartmentContoller and call GetById with
 
 // Starting the web server and "blocking here"
 app.Run();
