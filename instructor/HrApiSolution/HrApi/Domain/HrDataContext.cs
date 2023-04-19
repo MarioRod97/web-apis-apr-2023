@@ -12,6 +12,8 @@ public class HrDataContext : DbContext
     // All of the entity classes it should track in the database
     public DbSet<DepartmentEntity> Departments { get; set; }
     public DbSet<HiringRequestEntity> HiringRequests { get; set; }
+    public DbSet<PerformanceEvalEntity> PerformanceEvals { get; set; }
+    public DbSet<EmployeeEntity> Employees { get; set; }
 
     public IQueryable<DepartmentEntity> GetActiveDepartments()
     {
@@ -25,5 +27,7 @@ public class HrDataContext : DbContext
         modelBuilder.Entity<DepartmentEntity>()
             .HasIndex(b => b.Name).IsUnique();
 
+        modelBuilder.Entity<HiringRequestEntity>()
+            .Property(p => p.Salary).HasPrecision(18,2);
     }
 }
