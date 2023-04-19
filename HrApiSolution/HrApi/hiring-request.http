@@ -1,19 +1,37 @@
 ﻿### Adding a Hiring Request
-
 POST http://localhost:1337/hiring-requests
 Content-Type: application/json
+
 {
-  "firstName": "Bob",
-  "lastName": "Smith",
-  "notes": "Super hacker dude. Also plays guitar in some 80's band."
+  "firstName": "Nick",
+  "lastName": "Cave",
+  "notes": "Super hacker dude. Extreme."
 }
 
-### Get a Hiring Request
-GET http://localhost:1337/hiring-request/2
+
+### Get A Hiring Request
+GET http://localhost:1337/hiring-requests/3
 
 ### Assigning Salary
-PUT http://localhost:1337/hiring-requests/2/salary
+PUT http://localhost:1337/hiring-requests/3/salary
 Content-Type: application/json
+
 {
-  "salary": 182000
+  "salary": 162000
+}
+
+
+### Get the salary
+GET http://localhost:1337/hiring-requests/3/salary
+
+### Assign Them to a department
+POST http://localhost:1337/departments/2/employees
+Content-Type: application/json
+
+{
+  "id": "3",
+  "firstName": "Nick",
+  "lastName": "Cave",
+  "notes": "Super hacker dude. Extreme.",
+  "status": "AwaitingDepartment"
 }

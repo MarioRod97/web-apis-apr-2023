@@ -14,6 +14,20 @@ public class HiringRequestsController : ControllerBase
         _hiringManager = hiringManager;
     }
 
+    [HttpPost("/departments/{id:int}/employees")]
+    public async Task<ActionResult> AssignEmployeeToDepartment(int id, [FromBody] HiringRequestResponseModel request)
+    {
+        (bool WasFound, int Id) = await _hiringManager.AssignToDeparment(departmentId: id, request);
+        if (WasFound)
+        {
+            return Ok(Id);
+        }
+        else
+        {
+            return NotFound();
+        }
+    }
+
     [HttpPut("/hiring-requests/{id:int}/salary")]
     public async Task<ActionResult> AssignSalary(int id, [FromBody] HiringRequestSalaryModel model)
     {
@@ -25,6 +39,21 @@ public class HiringRequestsController : ControllerBase
         } else
         {
             return NotFound();
+        }
+    }
+
+    [HttpGet("/hiring-requests/{id:int}/salary")]
+    public async Task<ActionResult> GetSalary(int id)
+    {
+        HiringRequestSalaryModel? response = await _hiringManager.GetSalaryForAsync(id);
+
+        if (response is null)
+        {
+            return NotFound();
+        }
+        else
+        {
+            return Ok(response);
         }
     }
 
