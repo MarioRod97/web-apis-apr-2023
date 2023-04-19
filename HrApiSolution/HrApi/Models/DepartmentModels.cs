@@ -8,7 +8,15 @@ public record DepartmentCreateRequest
     public string Name { get; set; } = string.Empty;
 }
 
-public record DepartmentResponse
+public record DepartmentUpdateRequest
+{
+    [Required]
+    public int? Id { get; set; }
+    [Required, MinLength(3), MaxLength(20)]
+    public string Name { get; set; } = string.Empty;
+}
+
+public record DepartmentsResponse
 {
     public List<DepartmentSummaryItem> Data { get; set; } = new();
 }
